@@ -1,73 +1,22 @@
-import { useState, useRef, useEffect } from 'react';
-import { Navbar } from '@/components/Navbar';
-import { HeroSection } from '@/components/HeroSection';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { ParsedResults } from '@/components/ParsedResults';
-import { SkillMatchCard } from '@/components/SkillMatchCard';
-import { LoadingState } from '@/components/LoadingState';
-import { EmptyState } from '@/components/EmptyState';
-import { ParsedJobData } from '@/types/job';
-import { getUserSkills, calculateSkillMatch } from '@/lib/skillsStorage';
-import { Sparkles, Clipboard, Trash2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-
-// Mock parsing function - replace with actual AI call
-const mockParseJobDescription = (text: string): ParsedJobData => {
-  const lowerText = text.toLowerCase();
-  
-  // Extract skills from the text
-  const skillKeywords = [
-    'react', 'typescript', 'javascript', 'node.js', 'python', 'java', 'aws', 
-    'docker', 'kubernetes', 'postgresql', 'mongodb', 'graphql', 'rest', 'git',
-    'ci/cd', 'agile', 'machine learning', 'sql', 'linux', 'azure', 'gcp',
-    'terraform', 'redis', 'elasticsearch', 'microservices', 'html', 'css',
-    'vue', 'angular', 'spring', 'django', 'flask', 'express', 'nextjs'
-  ];
-  
-  const foundSkills = skillKeywords.filter(skill => 
-    lowerText.includes(skill.toLowerCase())
-  ).map(s => s.charAt(0).toUpperCase() + s.slice(1));
-  
-  return {
-    h1bSponsorship: {
-      status: lowerText.includes('h1b') || lowerText.includes('visa sponsor') 
-        ? (lowerText.includes('not sponsor') || lowerText.includes('no sponsor') || lowerText.includes('unable to sponsor') ? 'no' : 'yes')
-        : 'unknown',
-      details: lowerText.includes('h1b') ? 'H1B visa sponsorship mentioned in job description' : undefined,
-    },
-    salary: {
-      min: 120000,
-      max: 180000,
-      currency: '$',
-      period: 'year',
-    },
-    citizenship: {
-      required: lowerText.includes('us citizen') || lowerText.includes('citizenship required') || lowerText.includes('must be a u.s. citizen'),
-      securityClearance: lowerText.includes('clearance') || lowerText.includes('secret'),
-      details: lowerText.includes('authorized to work') ? 'Must be authorized to work in the US' : undefined,
-    },
-    experience: {
-      yearsMin: 3,
-      yearsMax: 5,
-      level: 'Mid-Senior Level',
-    },
-    skills: foundSkills.length > 0 ? foundSkills : ['React', 'TypeScript', 'Node.js', 'AWS', 'PostgreSQL'],
-    location: {
-      type: lowerText.includes('remote') ? 'remote' : lowerText.includes('hybrid') ? 'hybrid' : 'onsite',
-      city: 'San Francisco',
-      state: 'CA',
-      country: 'USA',
-    },
-    company: 'Tech Company Inc.',
-    title: 'Senior Software Engineer',
-    employmentType: 'Full-time',
-  };
-};
+import { useState, useRef, useEffect } from "react";
+import { Navbar } from "@/components/Navbar";
+import { HeroSection } from "@/components/HeroSection";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { ParsedResults } from "@/components/ParsedResults";
+import { SkillMatchCard } from "@/components/SkillMatchCard";
+import { LoadingState } from "@/components/LoadingState";
+import { EmptyState } from "@/components/EmptyState";
+import { ParsedJobData } from "@/types/job";
+import { getUserSkills, calculateSkillMatch } from "@/lib/skillsStorage";
+import { Sparkles, Clipboard, Trash2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import axios from "axios";
 
 const Index = () => {
-  const [jobDescription, setJobDescription] = useState('');
-  const [parsedData, setParsedData] = useState<ParsedJobData | null>(null);
+  const [jobDescription, setJobDescription] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [parsedData, setParsedData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [userSkills, setUserSkills] = useState<string[]>([]);
   const [skillMatch, setSkillMatch] = useState<{
@@ -75,7 +24,7 @@ const Index = () => {
     missingSkills: string[];
     matchPercentage: number;
   } | null>(null);
-  
+
   const analyzerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -84,41 +33,49 @@ const Index = () => {
   }, []);
 
   const scrollToAnalyzer = () => {
-    analyzerRef.current?.scrollIntoView({ behavior: 'smooth' });
+    analyzerRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const handleAnalyze = async () => {
+    console.log(jobDescription);
     if (!jobDescription.trim()) {
       toast({
-        title: 'No job description',
-        description: 'Please paste a job description to analyze',
-        variant: 'destructive',
+        title: "No job description",
+        description: "Please paste a job description to analyze",
+        variant: "destructive",
       });
       return;
     }
+    try {
+      setIsLoading(true);
+      setSkillMatch(null);
 
-    setIsLoading(true);
-    setParsedData(null);
-    setSkillMatch(null);
+      const { data } = await axios.post("http://localhost:8000/analyze", {
+        description: jobDescription,
+      });
+      // Simulate API call delay
 
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
+      setParsedData(data);
 
-    const result = mockParseJobDescription(jobDescription);
-    setParsedData(result);
+      // Calculate skill match
+      const currentUserSkills = getUserSkills();
+      setUserSkills(currentUserSkills);
+      const match = calculateSkillMatch(
+        currentUserSkills,
+        parsedData?.skills_extracted || []
+      );
+      setSkillMatch(match);
 
-    // Calculate skill match
-    const currentUserSkills = getUserSkills();
-    setUserSkills(currentUserSkills);
-    const match = calculateSkillMatch(currentUserSkills, result.skills);
-    setSkillMatch(match);
+      setIsLoading(false);
 
-    setIsLoading(false);
-
-    toast({
-      title: 'Analysis complete',
-      description: 'Job description has been parsed successfully',
-    });
+      toast({
+        title: "Analysis complete",
+        description: "Job description has been parsed successfully",
+      });
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Error analyzing job description:", error);
+    }
   };
 
   const handlePaste = async () => {
@@ -126,20 +83,20 @@ const Index = () => {
       const text = await navigator.clipboard.readText();
       setJobDescription(text);
       toast({
-        title: 'Pasted from clipboard',
-        description: 'Job description has been pasted',
+        title: "Pasted from clipboard",
+        description: "Job description has been pasted",
       });
     } catch {
       toast({
-        title: 'Unable to paste',
-        description: 'Please paste manually using Ctrl+V',
-        variant: 'destructive',
+        title: "Unable to paste",
+        description: "Please paste manually using Ctrl+V",
+        variant: "destructive",
       });
     }
   };
 
   const handleClear = () => {
-    setJobDescription('');
+    setJobDescription("");
     setParsedData(null);
     setSkillMatch(null);
   };
@@ -147,7 +104,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       {/* Hero Section */}
       <HeroSection onScrollToAnalyzer={scrollToAnalyzer} />
 
@@ -166,7 +123,8 @@ const Index = () => {
               Analyze Job Description
             </h2>
             <p className="text-muted-foreground max-w-lg mx-auto">
-              Paste any job posting below and get instant insights about visa sponsorship, salary, and requirements.
+              Paste any job posting below and get instant insights about visa
+              sponsorship, salary, and requirements.
             </p>
           </div>
 
@@ -174,7 +132,9 @@ const Index = () => {
             {/* Input Section */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-foreground">Job Description</h3>
+                <h3 className="text-lg font-semibold text-foreground">
+                  Job Description
+                </h3>
                 <div className="flex gap-2">
                   <Button
                     variant="ghost"
@@ -240,8 +200,10 @@ Location: Remote (US-based) or Hybrid (San Francisco, CA)"
 
             {/* Results Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-foreground">Parsed Results</h3>
-              
+              <h3 className="text-lg font-semibold text-foreground">
+                Parsed Results
+              </h3>
+
               <div className="glass-card p-6 min-h-[500px]">
                 {isLoading ? (
                   <LoadingState />
