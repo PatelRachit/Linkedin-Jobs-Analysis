@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Sparkles, User } from 'lucide-react';
+import { Sparkles, User, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -30,6 +30,19 @@ export function Navbar() {
               )}
             >
               Analyzer
+            </Button>
+          </Link>
+          <Link to="/dashboard">
+            <Button
+              variant={location.pathname === '/dashboard' ? 'secondary' : 'ghost'}
+              size="sm"
+              className={cn(
+                'text-muted-foreground',
+                location.pathname === '/dashboard' && 'text-foreground'
+              )}
+            >
+              <BarChart3 className="w-4 h-4 mr-1" />
+              Dashboard
             </Button>
           </Link>
           <Link to="/profile">

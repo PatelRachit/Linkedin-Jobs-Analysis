@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
-
 @layer base {
   :root {
     --background: 220 20% 6%;
@@ -124,12 +122,9 @@
   }
 
   @keyframes pulse-glow {
-
-    0%,
-    100% {
+    0%, 100% {
       box-shadow: 0 0 20px hsl(175 80% 50% / 0.3);
     }
-
     50% {
       box-shadow: 0 0 40px hsl(175 80% 50% / 0.5);
     }
@@ -137,10 +132,12 @@
 
   .animate-shimmer {
     animation: shimmer 2s linear infinite;
-    background: linear-gradient(90deg,
-        hsl(var(--muted)) 0%,
-        hsl(var(--secondary)) 50%,
-        hsl(var(--muted)) 100%);
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--secondary)) 50%,
+      hsl(var(--muted)) 100%
+    );
     background-size: 200% 100%;
   }
 
@@ -148,7 +145,6 @@
     0% {
       background-position: 200% 0;
     }
-
     100% {
       background-position: -200% 0;
     }
