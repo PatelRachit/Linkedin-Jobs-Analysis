@@ -136,9 +136,9 @@ The frontend will be available at: http://localhost:8080
 ## Google Colab (Recommended for Training)
 
 1. Upload `archive (1).zip` to Colab
-2. Open and run all cells in `DS_5110_Project (5).ipynb`
-3. Open and run all cells in `Untitled15 (1).ipynb`
-4. Open and run all cells in `Untitled16 (1).ipynb`
+2. Open and run all cells in `data_cleaning.ipynb`
+3. Open and run all cells in `data_visualization.ipynb`
+4. Open and run all cells in `ml_training.ipynb`
 5. Download the generated `.pkl` files
 6. Place them in the `backend/` folder
 
