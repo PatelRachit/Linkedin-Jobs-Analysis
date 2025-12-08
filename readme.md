@@ -23,7 +23,7 @@ python -m spacy download en_core_web_sm
 
 ### STEP 1: Create Cleaned Dataset (START HERE)
 
-**Run: `DS_5110_Project (5).ipynb`**
+**Run: `data_cleaning.ipynb`**
 
 - Unzips the dataset
 - Cleans and processes all job postings
@@ -32,7 +32,7 @@ python -m spacy download en_core_web_sm
 
 ### STEP 2: Visualizations
 
-**Run: `Untitled15 (1).ipynb`**
+**Run: `data_visulization.ipynb`**
 
 - Requires: `./clean_linkedin_jobs_parquet/` from Step 1
 - Creates charts and graphs
@@ -40,7 +40,7 @@ python -m spacy download en_core_web_sm
 
 ### STEP 3: Machine Learning Models
 
-**Run: `Untitled16 (1).ipynb`**
+**Run: `ml_training.ipynb`**
 
 - Requires: `./clean_linkedin_jobs_parquet/` from Step 1
 - Trains ML models and saves `.pkl` files
