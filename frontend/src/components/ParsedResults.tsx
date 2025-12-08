@@ -58,12 +58,6 @@ export function ParsedResults({ data }: ParsedResultsProps) {
               </span>
             </h2>
           )}
-          {data.company && (
-            <p className="text-muted-foreground flex items-center gap-2">
-              <Building className="w-4 h-4" />
-              {data.company}
-            </p>
-          )}
         </div>
       )}
 
