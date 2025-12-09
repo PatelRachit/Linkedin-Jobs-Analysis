@@ -80,7 +80,6 @@ The API will be available at:
 
 | Method | Endpoint   | Description             |
 | ------ | ---------- | ----------------------- |
-| GET    | `/`        | API info                |
 | POST   | `/analyze` | Analyze job description |
 
 #### Example Request
